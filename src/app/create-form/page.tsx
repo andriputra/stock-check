@@ -31,9 +31,10 @@ export default function CreateFormPage() {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-
+    console.log("Submitting data:", items);
     try {
       const response = await createForm(items);
+      console.log("Response from API:", response);
       setItems([{ end_customer: '', order_point: '', part_number: '', quantity: 0 }]);
       if (response?.message) {
         alert(response.message || 'Form created successfully');

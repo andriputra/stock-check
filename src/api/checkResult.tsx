@@ -5,13 +5,16 @@ import { AxiosError } from 'axios'; // Import AxiosError for better type handlin
 export const checkResult = async () => {
   try {
     const response = await apiClient.get('/api/check_result');
-    
+
+    console.log("API Response:", response.data); 
+
     if (response.status === 200) {
         return response.data;
     } else {
         throw new Error('Failed to check result.');
     }
   } catch (error) {
+    console.error("Error fetching check results:", error);
     if (error instanceof AxiosError) {
       throw new Error(error.response?.data?.message || 'An unknown error occurred.');
     }

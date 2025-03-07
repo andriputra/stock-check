@@ -1,16 +1,59 @@
 'use client';
 
-import { useState } from 'react';
-// import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import DashboardLayout from '@/src/components/layout/DashboardLayout';
 import { createForm } from '@/src/api/form';
+import axios from 'axios';
+import { debounce } from 'lodash';
+import apiClient from '@/src/api/apiClient';
 
+interface FormItem {
+  end_customer: string;
+  order_point: string;
+  part_number: string;
+  quantity: number;
+}
 
 export default function CreateFormPage() {
-  // const router = useRouter();
-  const [items, setItems] = useState([{ end_customer: '', order_point: '', part_number: '', quantity: 0 }]);
+  const [items, setItems] = useState<FormItem[]>([
+    { end_customer: '', order_point: '', part_number: '', quantity: 0 }
+  ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [customerOptions, setCustomerOptions] = useState<{ id: string; nama: string }[]>([]);
+  const [partNumberOptions, setPartNumberOptions] = useState<{ id: string; code: string }[]>([]);
+
+  // Mencari customer berdasarkan nama
+  const searchCustomers = debounce(async (query: string) => {
+    if (!query.trim()) return setCustomerOptions([]);
+    try {
+      console.log("Fetching customers for:", query);
+      const response = await apiClient.get('/api/customers', { params: { nama: query }, withCredentials: true });
+      console.log("Customer response:", response.data);
+      setCustomerOptions(
+        response.data.map((nama: string, index: number) => ({ id: String(index), nama }))
+      );
+    } catch (err) {
+      console.error("Error fetching customers:", err);
+      setCustomerOptions([]);
+    }
+  }, 300);
+
+  // Mencari part number berdasarkan kode
+  const searchPartNumbers = debounce(async (query: string) => {
+    if (!query.trim()) return setPartNumberOptions([]);
+    try {
+      console.log("Fetching part numbers for:", query);
+      const response = await apiClient.get('/api/datapn', { params: { code: query }, withCredentials: true });
+      console.log("Part number response:", response.data);
+      setPartNumberOptions(
+        response.data.map((code: string, index: number) => ({ id: String(index), code }))
+      );
+    } catch (err) {
+      console.error("Error fetching part numbers:", err);
+      setPartNumberOptions([]);
+    }
+  }, 300);
 
   const handleAddItem = () => {
     setItems([...items, { end_customer: '', order_point: '', part_number: '', quantity: 0 }]);
@@ -20,34 +63,56 @@ export default function CreateFormPage() {
     setItems(items.filter((_, idx) => idx !== index));
   };
 
-  const handleChange = (index: number, field: string, value: string | number) => {
+  const handleChange = (index: number, field: keyof FormItem, value: string | number) => {
+    console.log(`Changing field: ${field}, Value: ${value}`);
+    
     const updatedItems = items.map((item, idx) =>
       idx === index ? { ...item, [field]: value } : item
     );
     setItems(updatedItems);
+  
+    if (field === 'end_customer') {
+      console.log("Triggering customer search...");
+      searchCustomers(value as string);
+    }
+    if (field === 'part_number') {
+      console.log("Triggering part number search...");
+      searchPartNumbers(value as string);
+    }
+  };
+  
+
+  const handleSelectCustomer = (index: number, name: string) => {
+    handleChange(index, 'end_customer', name);
+    setCustomerOptions(prevOptions => prevOptions.filter(c => c.nama !== name));
+  };
+
+  const handleSelectPartNumber = (index: number, code: string) => {
+    handleChange(index, 'part_number', code);
+    setPartNumberOptions(prevOptions => prevOptions.filter(c => c.code !== code));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-    console.log("Submitting data:", items);
+
     try {
-      const response = await createForm(items);
-      console.log("Response from API:", response);
+      const response = await createForm({ items });
+
       setItems([{ end_customer: '', order_point: '', part_number: '', quantity: 0 }]);
-      if (response?.message) {
-        alert(response.message || 'Form created successfully');
-      } else {
-        setError('Failed to create the form. No message in response.');
-      }
-    } catch (err) {
-      setError("Error occurred");
-      console.error('Error: ', err);
+      alert(response?.message || 'Form created successfully');
+    } catch (err: any) {
+      console.error('Full error object:', err);
+      setError(err.response?.data?.message || 'API request failed');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    console.log("Updated customer options:", customerOptions);
+  }, [customerOptions]);
 
   return (
     <DashboardLayout>
@@ -74,7 +139,8 @@ export default function CreateFormPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
+                  {/* Input End Customer dengan AutoComplete */}
+                  <div className="relative">
                     <label className="block text-gray-700 font-medium mb-1">End Customer</label>
                     <input
                       type="text"
@@ -83,8 +149,22 @@ export default function CreateFormPage() {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-400 text-gray-900"
                       required
                     />
+                    {customerOptions.length > 0 && !items.some(item => item.end_customer === customerOptions[0].nama) && (
+                      <ul className="absolute bg-white border border-gray-300 mt-1 w-full rounded-lg shadow-lg z-10">
+                        {customerOptions.map((customer) => (
+                          <li
+                            key={customer.id}
+                            onClick={() => handleSelectCustomer(index, customer.nama)}
+                            className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                          >
+                            <span className='text-black'>{customer.nama}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
 
+                  {/* Order Point */}
                   <div>
                     <label className="block text-gray-700 font-medium mb-1">Order Point</label>
                     <select
@@ -103,7 +183,8 @@ export default function CreateFormPage() {
                     </select>
                   </div>
 
-                  <div>
+                  {/* Input Part Number dengan AutoComplete */}
+                  <div className="relative">
                     <label className="block text-gray-700 font-medium mb-1">Part Number</label>
                     <input
                       type="text"
@@ -112,8 +193,21 @@ export default function CreateFormPage() {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-400 text-gray-900"
                       required
                     />
+                    {partNumberOptions.length > 0 && !items.some(item => item.part_number === partNumberOptions[0].code) &&  (
+                      <ul className="absolute bg-white border border-gray-300 mt-1 w-full rounded-lg shadow-lg">
+                        {partNumberOptions.map((part) => (
+                          <li
+                            key={part.id}
+                            onClick={() => handleSelectPartNumber(index, part.code)}
+                            className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+                          >
+                             <span className='text-black'>{part.code}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
-
+                  {/* Quantity */}
                   <div>
                     <label className="block text-gray-700 font-medium mb-1">Quantity</label>
                     <input
@@ -127,7 +221,6 @@ export default function CreateFormPage() {
                 </div>
               </div>
             ))}
-
             <button
               type="button"
               onClick={handleAddItem}
@@ -137,13 +230,10 @@ export default function CreateFormPage() {
             </button>
 
             <div className="flex justify-end">
-              <button
-                type="submit"
-                className={`bg-green-500 text-white font-medium py-2 px-6 rounded-lg hover:bg-green-600 transition duration-300 ${
-                  isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-                disabled={isSubmitting}
-              >
+              <button 
+                type="submit" 
+                className={`bg-green-500 text-white font-medium py-2 px-6 rounded-lg hover:bg-green-600 transition duration-300 ${ isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={isSubmitting}>
                 {isSubmitting ? 'Submitting...' : 'Create Form'}
               </button>
             </div>
@@ -153,3 +243,4 @@ export default function CreateFormPage() {
     </DashboardLayout>
   );
 }
+

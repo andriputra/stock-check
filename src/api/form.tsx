@@ -1,5 +1,5 @@
 import apiClient from './apiClient';
-import { AxiosError } from 'axios'; // Import AxiosError for better type handling
+import { AxiosError } from 'axios';
 
 interface Item {
   end_customer: string;
@@ -9,9 +9,9 @@ interface Item {
 }
 
 // Create a new form by posting items to the backend
-export const createForm = async (items: Item[]) => {
+export const createForm = async (data: { items: Item[] }) => {
   try {
-    const response = await apiClient.post('/api/create_form', { items }, { withCredentials: true});
+    const response = await apiClient.post('/api/create_form',data, { withCredentials: true});
     console.log("API Response:", response.data); 
 
     // Check if the response status is either 200 or 201 (success)

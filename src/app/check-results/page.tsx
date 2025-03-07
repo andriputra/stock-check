@@ -77,13 +77,15 @@ export default function CheckResults() {
 
   const renderInventoryStatus = (inventoryStatus: Record<string, string>) => {
     return (
-      <div>
+      <ul className="list-none">
         {Object.entries(inventoryStatus).map(([location, status]) => (
-          <div key={location}>
-            <strong>{location}:</strong> {status}
-          </div>
+           <li key={location} className="text-gray-800">
+           <span className="font-semibold">
+             {location.replace(/[{}"]/g, '')}:
+           </span> {status.replace(/[{}"]/g, '')}
+         </li>
         ))}
-      </div>
+      </ul>
     );
   };
 
@@ -106,53 +108,59 @@ export default function CheckResults() {
                 className="w-1/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-600 text-gray-900"
               />
             </div>
-            <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-              <table className="min-w-full text-sm text-left border border-gray-200">
-                <thead className="bg-gray-800 text-white text-left">
-                  <tr>
-                    <th className="px-4 py-3 w-28">Form Number</th>
-                    <th className="px-4 py-3 w-40">Check Result Item ID</th>
-                    <th className="px-4 py-3 w-32">End Customer</th>
-                    <th className="px-4 py-3 w-32">Submit Date</th>
-                    <th className="px-4 py-3 w-32">Result Date</th>
-                    <th className="px-4 py-3 w-40">Part Number</th>
-                    <th className="px-4 py-3 w-64">Description</th>
-                    <th className="px-4 py-3 w-20">Quantity</th>
-                    <th className="px-4 py-3 w-32">Order Point</th>
-                    <th className="px-4 py-3 w-80">Inventory Status</th>
-                    <th className="px-4 py-3 w-40">2nd PN</th>
-                    <th className="px-4 py-3 w-64">2nd PN Description</th>
-                    <th className="px-4 py-3 w-40">3rd PN</th>
-                    <th className="px-4 py-3 w-64">3rd PN Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredResults.length > 0 ? (
-                    filteredResults.map((item) => (
-                      <tr key={item.check_result_item_id} className="border-b hover:bg-gray-50">
-                        <td className="px-4 py-3 text-gray-800">{item.form_number || 'N/A'}</td>
-                        <td className="px-4 py-3 text-gray-800">{item.check_result_item_id || 'N/A'}</td>
-                        <td className="px-4 py-3 text-gray-800">{item.end_customer || 'N/A'}</td>
-                        <td className="px-4 py-3 text-gray-800">{item.submit_date || 'N/A'}</td>
-                        <td className="px-4 py-3 text-gray-800">{item.result_date || 'Pending'}</td>
-                        <td className="px-4 py-3 text-gray-800">{item.part_number || 'N/A'}</td>
-                        <td className="px-4 py-3 text-gray-800">{item.description || 'N/A'}</td>
-                        <td className="px-4 py-3 text-gray-800">{item.quantity || 0}</td>
-                        <td className="px-4 py-3 text-gray-800">{item.order_point || 'N/A'}</td>
-                        <td className="px-4 py-3 text-gray-800">{renderInventoryStatus(item.inventory_status)}</td>
-                        <td className="px-8 py-4 text-gray-800">2nd</td>
-                        <td className="px-8 py-4 text-gray-800">2nd description</td>
-                        <td className="px-8 py-4 text-gray-800">3rd</td>
-                        <td className="px-8 py-4 text-gray-800">3rd description</td>
-                      </tr>
-                    ))
-                  ) : (
+            <div className="w-full overflow-x-auto">
+              <div className="min-w-max bg-white shadow-md rounded-lg">
+                <table className="w-full text-sm text-left border border-gray-200">
+                  <thead className="bg-gray-800 text-white">
                     <tr>
-                      <td colSpan={14} className="text-center py-6 text-gray-800">No results found.</td>
+                      <th className="px-4 py-3 w-auto">Form Number</th>
+                      <th className="px-4 py-3 w-auto">Check Result Item ID</th>
+                      <th className="px-4 py-3 w-auto">End Customer</th>
+                      <th className="px-4 py-3 w-auto">Submit Date</th>
+                      <th className="px-4 py-3 w-auto">Result Date</th>
+                      <th className="px-4 py-3 w-auto">Part Number</th>
+                      <th className="px-4 py-3 w-auto">Description</th>
+                      <th className="px-4 py-3 w-auto">Quantity</th>
+                      <th className="px-4 py-3 w-auto">Order Point</th>
+                      <th className="px-4 py-3 w-auto">Inventory Status</th>
+                      <th className="px-4 py-3 w-auto">2nd PN</th>
+                      <th className="px-4 py-3 w-auto">2nd PN Description</th>
+                      <th className="px-4 py-3 w-auto">3rd PN</th>
+                      <th className="px-4 py-3 w-auto">3rd PN Description</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filteredResults.length > 0 ? (
+                      filteredResults.map((item) => (
+                        <tr key={item.check_result_item_id} className="border-b hover:bg-gray-50">
+                          <td className="px-4 py-3 text-gray-800">{item.form_number || 'N/A'}</td>
+                          <td className="px-4 py-3 text-gray-800">{item.check_result_item_id || 'N/A'}</td>
+                          <td className="px-4 py-3 text-gray-800">{item.end_customer || 'N/A'}</td>
+                          <td className="px-4 py-3 text-gray-800">
+                            {item.submit_date ? new Date(item.submit_date).toLocaleString('sv-SE').replace(' ', ' | ') : 'N/A'}
+                          </td>
+                          <td className="px-4 py-3 text-gray-800">
+                            {item.result_date ? new Date(item.result_date).toLocaleString('sv-SE').replace(' ', ' | ') : 'Pending'}
+                          </td>
+                          <td className="px-4 py-3 text-gray-800">{item.part_number || 'N/A'}</td>
+                          <td className="px-4 py-3 text-gray-800">{item.description || 'N/A'}</td>
+                          <td className="px-4 py-3 text-gray-800">{item.quantity || 0}</td>
+                          <td className="px-4 py-3 text-gray-800">{item.order_point || 'N/A'}</td>
+                          <td className="px-4 py-3 text-gray-800">{renderInventoryStatus(item.inventory_status)}</td>
+                          <td className="px-8 py-4 text-gray-800">2nd</td>
+                          <td className="px-8 py-4 text-gray-800">2nd description</td>
+                          <td className="px-8 py-4 text-gray-800">3rd</td>
+                          <td className="px-8 py-4 text-gray-800">3rd description</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={14} className="text-center py-6 text-gray-800">No results found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </>
         )}

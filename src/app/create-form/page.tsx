@@ -23,7 +23,6 @@ export default function CreateFormPage() {
   const [customerOptions, setCustomerOptions] = useState<{ id: string; nama: string }[]>([]);
   const [partNumberOptions, setPartNumberOptions] = useState<{ id: string; code: string }[]>([]);
 
-  // Mencari customer berdasarkan nama
   const searchCustomers = debounce(async (query: string) => {
     if (!query.trim()) return setCustomerOptions([]);
     try {
@@ -39,7 +38,6 @@ export default function CreateFormPage() {
     }
   }, 300);
 
-  // Mencari part number berdasarkan kode
   const searchPartNumbers = debounce(async (query: string) => {
     if (!query.trim()) return setPartNumberOptions([]);
     try {
@@ -62,7 +60,6 @@ export default function CreateFormPage() {
   const handleRemoveItem = (index: number) => {
     setItems(items.filter((_, idx) => idx !== index));
   };
-
   const handleChange = (index: number, field: keyof FormItem, value: string | number) => {
     console.log(`Changing field: ${field}, Value: ${value}`);
     
@@ -139,7 +136,6 @@ export default function CreateFormPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Input End Customer dengan AutoComplete */}
                   <div className="relative">
                     <label className="block text-gray-700 font-medium mb-1">End Customer</label>
                     <input
@@ -182,8 +178,6 @@ export default function CreateFormPage() {
                       <option value="Kendari">Kendari</option>
                     </select>
                   </div>
-
-                  {/* Input Part Number dengan AutoComplete */}
                   <div className="relative">
                     <label className="block text-gray-700 font-medium mb-1">Part Number</label>
                     <input

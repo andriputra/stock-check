@@ -64,23 +64,25 @@ const FormDetailsPage = ({ params }: { params: { formNumber: string } }) => {
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-gray-100 px-8 py-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">Form Details</h1>
-        
         {formDetails.map((item) => (
-          <div key={item.check_result_item_id} className="mb-6 p-4 bg-white shadow rounded">
-            <p className="text-gray-700"><strong>Check Result Item ID:</strong> {item.check_result_item_id}</p>
-            <p className="text-gray-700"><strong>End Customer:</strong> {item.end_customer}</p>
-            <p className="text-gray-700"><strong>Part Number:</strong> {item.part_number}</p>
-            <p className="text-gray-700"><strong>Description:</strong> {item.description}</p>
-            <p className="text-gray-700"><strong>Order Point:</strong> {item.order_point}</p>
-            <p className="text-gray-700"><strong>Quantity:</strong> {item.quantity}</p>
-            <p className="text-gray-700"><strong>Inventory Status:</strong></p>
-            {renderInventoryStatus(item.inventory_status)}
+          <div key={item.check_result_item_id}>
+            <div className='flex justify-between items-center'>
+              <h1 className="text-lg font-bold text-gray-800 mb-4">{item.end_customer}</h1>
+              <h1 className="text-lg font-bold text-gray-800 mb-4">Detail Form : {item.check_result_item_id}</h1>
+            </div>
+            <div className="mb-6 p-4 bg-white shadow rounded">
+              <p className="text-gray-700"><strong>Part Number:</strong> {item.part_number}</p>
+              <p className="text-gray-700"><strong>Description:</strong> {item.description}</p>
+              <p className="text-gray-700"><strong>Order Point:</strong> {item.order_point}</p>
+              <p className="text-gray-700"><strong>Quantity:</strong> {item.quantity}</p>
+              <p className="text-gray-700"><strong>Inventory Status:</strong></p>
+              {renderInventoryStatus(item.inventory_status)}
+            </div>
           </div>
         ))}
 
         <button 
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
           onClick={() => router.push('/dashboard')}
         >
           Back to Forms

@@ -49,7 +49,7 @@ export default function CreateAdditionalDocumentPage() {
     setError(null);
 
     try {
-      const response = await createAdditionalDocument(additionalDocuments);
+      const response = await createAdditionalDocument({ items: additionalDocuments });
       setAdditionalDocuments([
         {
           part_number: '',

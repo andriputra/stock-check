@@ -5,6 +5,7 @@ interface Form {
   formNumber: string;
   submitDate: string;
   resultDate: string;
+  customer: string;
 }
 
 interface FormsTableProps {
@@ -13,7 +14,7 @@ interface FormsTableProps {
 
 const FormsTable = ({ forms }: FormsTableProps) => {
   const router = useRouter();
-
+  console.log("Forms data:", forms);
   const handleViewClick = (formNumber: string) => {
     router.push(`/form-details/${formNumber}`);
   };
@@ -33,6 +34,7 @@ const FormsTable = ({ forms }: FormsTableProps) => {
       <table className="min-w-full table-auto">
         <thead>
           <tr className="bg-gray-200 text-gray-600">
+            <th className="px-6 py-3 text-left">Customer</th>
             <th className="px-6 py-3 text-left">Form Number</th>
             <th className="px-6 py-3 text-left">Submit Date</th>
             <th className="px-6 py-3 text-left">Result Date</th>
@@ -45,11 +47,12 @@ const FormsTable = ({ forms }: FormsTableProps) => {
               key={form.formNumber}
               className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
             >
-              <td className="px-6 py-3 text-gray-700">{form.formNumber}</td>
-              <td className="px-6 py-3 text-gray-700">{form.submitDate}</td>
-              <td className="px-6 py-3 text-gray-700">{form.resultDate}</td>
+              <td className="px-6 py-3 text-gray-700 text-sm">{form.customer}</td>
+              <td className="px-6 py-3 text-gray-700 text-sm">{form.formNumber}</td>
+              <td className="px-6 py-3 text-gray-700 text-sm">{form.submitDate ? new Date(form.submitDate).toLocaleString('sv-SE').replace(' ', ' | ') : 'N/A'}</td>
+              <td className="px-6 py-3 text-gray-700 text-sm">{form.resultDate ? new Date(form.resultDate).toLocaleString('sv-SE').replace(' ', ' | ') : 'Pending'}</td>
               <td
-                className="px-6 py-3 text-blue-500 cursor-pointer"
+                className="px-6 py-3 text-blue-500 cursor-pointer text-sm"
                 onClick={() => handleViewClick(form.formNumber)}
               >
                 View

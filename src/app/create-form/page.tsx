@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import DashboardLayout from '@/src/components/layout/DashboardLayout';
 import { createForm } from '@/src/api/form';
-import axios from 'axios';
+// import axios from 'axios';
 import { debounce } from 'lodash';
 import apiClient from '@/src/api/apiClient';
+// import Select from 'react-select';
 
 interface FormItem {
   end_customer: string;
@@ -20,8 +21,8 @@ export default function CreateFormPage() {
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [customerOptions, setCustomerOptions] = useState<{ id: string; nama: string }[]>([]);
-  const [partNumberOptions, setPartNumberOptions] = useState<{ id: string; code: string }[]>([]);
+  const [customerOptions, setCustomerOptions] = useState<{ id: string; nama: string; value: string }[]>([]);
+  const [partNumberOptions, setPartNumberOptions] = useState<{ id: string; code: string; value: string }[]>([]);
 
   const searchCustomers = debounce(async (query: string) => {
     if (!query.trim()) return setCustomerOptions([]);
@@ -30,7 +31,7 @@ export default function CreateFormPage() {
       const response = await apiClient.get('/api/customers', { params: { nama: query }, withCredentials: true });
       console.log("Customer response:", response.data);
       setCustomerOptions(
-        response.data.map((nama: string, index: number) => ({ id: String(index), nama }))
+        response.data.map((nama: string, index: number) => ({ id: String(index), nama, value: nama }))
       );
     } catch (err) {
       console.error("Error fetching customers:", err);
@@ -77,7 +78,6 @@ export default function CreateFormPage() {
       searchPartNumbers(value as string);
     }
   };
-  
 
   const handleSelectCustomer = (index: number, name: string) => {
     handleChange(index, 'end_customer', name);

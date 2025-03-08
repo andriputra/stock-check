@@ -23,12 +23,14 @@ interface FormResponse {
   result_date: string | null;
   status: string;
   submit_date: string;
+  end_customer: string;
 }
 
 interface Form {
   formNumber: string;
   submitDate: string;
   resultDate: string;
+  customer: string;
 }
 
 export default function DashboardPage() {
@@ -52,6 +54,7 @@ export default function DashboardPage() {
           formNumber: form.form_number,
           submitDate: form.submit_date,
           resultDate: form.result_date,
+          customer: form.end_customer,
         }));
 
         setForms(mappedForms);
@@ -75,27 +78,29 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-semibold text-gray-800">Welcome to the Stock Checking Dashboard</h2>
-        <button
-          onClick={logout}
-          className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-300"
-        >
-          Logout
-        </button>
-      </div>
+      <div className="min-h-screen bg-gray-100 px-8 py-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-semibold text-gray-800">Welcome to the Stock Checking Dashboard</h2>
+          <button
+            onClick={logout}
+            className="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-300"
+          >
+            Logout
+          </button>
+        </div>
 
-      {/* Form Stats Section */}
-      <div className="mt-8">
-        <h3 className="text-2xl font-semibold text-gray-800 mb-4">Recent Forms</h3>
+        {/* Form Stats Section */}
+        <div className="mt-8">
+          <h3 className="text-2xl font-semibold text-gray-800 mb-4">Recent Forms</h3>
 
-        {loading ? (
-          <p>Loading forms...</p>
-        ) : error ? (
-          <p>{error}</p>
-        ) : (
-          <FormsTable forms={forms} />
-        )}
+          {loading ? (
+            <p>Loading forms...</p>
+          ) : error ? (
+            <p>{error}</p>
+          ) : (
+            <FormsTable forms={forms} />
+          )}
+        </div>
       </div>
     </DashboardLayout>
   );
